@@ -1,7 +1,7 @@
 
 # Model API
 
-Sebuah API Backend Service yang menyediakan kumpulan aksara-aksara bali.API ini sudah berjalan dalam server cloud run dengan base url https://model-api-852069596535.asia-southeast2.run.app
+Sebuah API Backend Service yang memberikan prediksi untuk aksara-aksara bali.API ini sudah berjalan dalam server cloud run dengan base url https://model-api-852069596535.asia-southeast2.run.app
 
 ## Endpoint route 
 
