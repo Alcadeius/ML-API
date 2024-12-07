@@ -51,5 +51,24 @@ const getAllPredictions = async (userId) => {
     throw new Error("Failed to retrieve predictions");
   }
 };
+const deletePrediction = async (userId, predictionId) => {
+  try {
+    if (!userId || !predictionId) {
+      throw new Error("User ID and Prediction ID are required");
+    }
 
-module.exports = { savePrediction, getAllPredictions };
+    const predictionRef = firestore
+      .collection("users")
+      .doc(userId)
+      .collection("predictions")
+      .doc(predictionId);
+
+    await predictionRef.delete();
+    console.log(`Prediction with ID ${predictionId} deleted successfully!`);
+  } catch (err) {
+    console.error("Error deleting prediction from Firestore:", err);
+    throw new Error("Failed to delete prediction");
+  }
+};
+
+module.exports = { savePrediction, getAllPredictions, deletePrediction };

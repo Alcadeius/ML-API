@@ -9,6 +9,7 @@ const {
 const {
   savePrediction,
   getAllPredictions,
+  deletePrediction,
 } = require("../services/firestoreservice");
 const { errorHandler, errHandler } = require("../utils/errorHandler");
 const verifyToken = require("../middleware/verifyToken");
@@ -155,6 +156,28 @@ router.get("/predict/histories", verifyToken, async (req, res, next) => {
       status: "success",
       message: "Histories retrieved successfully",
       data: predictions,
+    });
+  } catch (err) {
+    next(errHandler(err));
+  }
+});
+router.delete("/predict/histories/:id", verifyToken, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    if (!id) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Prediction ID is required",
+      });
+    }
+
+    await deletePrediction(userId, id);
+
+    res.status(200).json({
+      status: "success",
+      message: `Prediction with ID ${id} deleted successfully`,
     });
   } catch (err) {
     next(errHandler(err));
