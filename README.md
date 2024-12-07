@@ -1,7 +1,7 @@
 
 # Model API
 
-Sebuah API Backend Service yang memberikan prediksi untuk aksara-aksara bali.API ini sudah berjalan dalam server cloud run dengan base url https://model-api-852069596535.asia-southeast2.run.app
+Sebuah API Backend Service yang menyediakan kumpulan aksara-aksara bali.API ini sudah berjalan dalam server cloud run dengan base url https://model-api-852069596535.asia-southeast2.run.app
 
 ## Endpoint route 
 
@@ -15,6 +15,8 @@ Sebuah API Backend Service yang memberikan prediksi untuk aksara-aksara bali.API
 ```
 - Method
   - POST
+-  Header
+  - ```Authorization``` value ```Bearer <token>```
 - Body
   - ```image``` as ```file```
 - Response
@@ -33,6 +35,31 @@ Sebuah API Backend Service yang memberikan prediksi untuk aksara-aksara bali.API
     }
 }
 ```
+#### Prediksi Result
+
+```http
+   /predict/latest
+```
+- Method
+  - Get
+-  Header
+  - ```Authorization``` value ```Bearer <token>```
+- Response
+```
+{
+    "status": "success",
+    "message": "Latest prediction retrieved successfully",
+    "data": {
+        "id": "7cd73138-8043-4144-b6d4-8208f5d76a66",
+        "topPredictions": [
+            "wa:99.93%",
+            "ga:0.04%",
+            "na:0.02%"
+        ],
+        "createdAt": "2024-12-07T02:26:28.944Z"
+    }
+}
+```
 #### Prediksi Handwriting
 
 ```http
@@ -40,6 +67,8 @@ Sebuah API Backend Service yang memberikan prediksi untuk aksara-aksara bali.API
 ```
 - Method
   - POST
+-  Header
+  - ```Authorization``` value ```Bearer <token>```
 -  Body
   - ```image``` as ```file```
 - Response
@@ -57,8 +86,31 @@ Sebuah API Backend Service yang memberikan prediksi untuk aksara-aksara bali.API
     }
 }
 ```
+#### Prediksi Histories
 
-
+```http
+   /predict/histories
+```
+- Method
+  - GET
+-  Header
+  - ```Authorization``` value ```Bearer <token>```
+- Response
+```
+{
+    "status": "success",
+    "message": "Histories retrieved successfully",
+    "data": [
+        {
+            "id": "7cd73138-8043-4144-b6d4-8208f5d76a66",
+            "topPredictions": [
+                "wa:99.93%",
+                "ga:0.04%",
+                "na:0.02%"
+            ],
+            "createdAt": "2024-12-07T02:26:28.944Z"
+        },
+```
 
 
 
