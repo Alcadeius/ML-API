@@ -1,34 +1,25 @@
-// const jwt = require("jsonwebtoken");
+const { admin } = require("../firebaseadmin");
 
-// const verifyToken = (req, res, next) => {
-//   const authHeader = req.headers["authorization"];
+const verifyToken = async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({
+      status: "fail",
+      message: "Unauthorized: No token provided",
+    });
+  }
 
-//   if (!authHeader) {
-//     return res.status(401).json({
-//       status: "fail",
-//       message: "Access Denied. No token provided.",
-//     });
-//   }
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.user = { id: decodedToken.uid };
+    next();
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    res.status(401).json({
+      status: "fail",
+      message: "Unauthorized: Invalid token",
+    });
+  }
+};
 
-//   const token = authHeader.split(" ")[1];
-
-//   if (!token) {
-//     return res.status(401).json({
-//       status: "fail",
-//       message: "Access Denied. Token missing.",
-//     });
-//   }
-
-//   try {
-//     const verified = jwt.verify(token, process.env.JWT_SECRET);
-//     req.user = verified;
-//     next();
-//   } catch (err) {
-//     return res.status(403).json({
-//       status: "fail",
-//       message: "Invalid or expired token.",
-//     });
-//   }
-// };
-
-// module.exports = verifyToken;
+module.exports = verifyToken;

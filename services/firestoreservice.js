@@ -1,8 +1,11 @@
-const { Firestore } = require("@google-cloud/firestore");
-const firestore = new Firestore();
+const { firestore } = require("../firebaseadmin");
 
 const savePrediction = async (prediction) => {
   try {
+    if (!prediction.userId || !prediction.topPredictions || !prediction.id) {
+      throw new Error("Invalid prediction data");
+    }
+
     const userPredictionsRef = firestore
       .collection("users")
       .doc(prediction.userId)
@@ -10,7 +13,7 @@ const savePrediction = async (prediction) => {
 
     await userPredictionsRef.doc(prediction.id).set({
       topPredictions: prediction.topPredictions,
-      createdAt: prediction.createdAt,
+      createdAt: prediction.createdAt || new Date().toISOString(),
     });
 
     console.log("Prediction saved successfully!");
@@ -22,19 +25,26 @@ const savePrediction = async (prediction) => {
 
 const getAllPredictions = async (userId) => {
   try {
+    if (!userId) {
+      throw new Error("User ID is required to fetch predictions");
+    }
+
     const predictionsRef = firestore
       .collection("users")
       .doc(userId)
       .collection("predictions");
 
     const snapshot = await predictionsRef.orderBy("createdAt", "desc").get();
-    const predictions = [];
-    snapshot.forEach((doc) => {
-      predictions.push({
-        id: doc.id,
-        ...doc.data(),
-      });
-    });
+
+    if (snapshot.empty) {
+      console.log("No predictions found for user:", userId);
+      return [];
+    }
+
+    const predictions = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     return predictions;
   } catch (err) {
     console.error("Error retrieving predictions from Firestore:", err);

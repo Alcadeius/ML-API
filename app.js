@@ -2,10 +2,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const predictRoutes = require("./routes/predictRoutes");
+const verifyToken = require("./middleware/verifyToken");
 
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
+app.use(verifyToken);
 app.use("/", predictRoutes);
 
 app.use((err, req, res, next) => {

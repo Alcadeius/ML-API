@@ -11,7 +11,7 @@ const {
   getAllPredictions,
 } = require("../services/firestoreservice");
 const { errorHandler, errHandler } = require("../utils/errorHandler");
-// const verifyToken = require("../middleware/verifyToken");
+const verifyToken = require("../middleware/verifyToken");
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -20,7 +20,7 @@ const upload = multer({
   limits: { fileSize: 1 * 1024 * 1024 },
 }).single("image");
 
-router.post("/predict", (req, res, next) => {
+router.post("/predict", verifyToken, (req, res, next) => {
   upload(req, res, async (err) => {
     if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
       return res.status(413).json({
@@ -56,12 +56,12 @@ router.post("/predict", (req, res, next) => {
       const createdAt = new Date().toISOString();
       const prediction = {
         id,
-        // userId: req.user.id,
+        userId: req.user.id,
         topPredictions: predictionResults,
         createdAt,
       };
 
-      // await savePrediction(prediction);
+      await savePrediction(prediction);
 
       res.status(200).json({
         status: "success",
@@ -74,7 +74,7 @@ router.post("/predict", (req, res, next) => {
     }
   });
 });
-router.post("/predict/handwrite", (req, res, next) => {
+router.post("/predict/handwrite", verifyToken, (req, res, next) => {
   upload(req, res, async (err) => {
     if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
       return res.status(413).json({
@@ -107,15 +107,15 @@ router.post("/predict/handwrite", (req, res, next) => {
       }
 
       const id = uuidv4();
-      // const createdAt = new Date().toISOString();
+      const createdAt = new Date().toISOString();
       const prediction = {
         id,
-        // userId: req.user.id,
+        userId: req.user.id,
         topPredictions: predictionResults,
-        // createdAt,
+        createdAt,
       };
 
-      // await savePrediction(prediction);
+      await savePrediction(prediction);
 
       res.status(200).json({
         status: "success",
@@ -128,7 +128,30 @@ router.post("/predict/handwrite", (req, res, next) => {
     }
   });
 });
-router.get("/predict/histories", async (req, res, next) => {
+router.get("/predict/latest", verifyToken, async (req, res, next) => {
+  try {
+    // Ambil prediksi terbaru berdasarkan userId
+    const predictions = await getAllPredictions(req.user.id);
+    if (predictions.length === 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No predictions found for this user",
+      });
+    }
+
+    // Ambil prediksi terakhir yang disimpan
+    const latestPrediction = predictions[0]; // Ambil prediksi pertama (terbaru) berdasarkan orderBy
+
+    res.status(200).json({
+      status: "success",
+      message: "Latest prediction retrieved successfully",
+      data: latestPrediction,
+    });
+  } catch (err) {
+    next(errHandler(err));
+  }
+});
+router.get("/predict/histories", verifyToken, async (req, res, next) => {
   try {
     const predictions = await getAllPredictions(req.user.id);
     res.status(200).json({
