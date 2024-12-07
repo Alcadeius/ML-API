@@ -130,7 +130,6 @@ router.post("/predict/handwrite", verifyToken, (req, res, next) => {
 });
 router.get("/predict/latest", verifyToken, async (req, res, next) => {
   try {
-    // Ambil prediksi terbaru berdasarkan userId
     const predictions = await getAllPredictions(req.user.id);
     if (predictions.length === 0) {
       return res.status(404).json({
@@ -139,9 +138,7 @@ router.get("/predict/latest", verifyToken, async (req, res, next) => {
       });
     }
 
-    // Ambil prediksi terakhir yang disimpan
-    const latestPrediction = predictions[0]; // Ambil prediksi pertama (terbaru) berdasarkan orderBy
-
+    const latestPrediction = predictions[0];
     res.status(200).json({
       status: "success",
       message: "Latest prediction retrieved successfully",
