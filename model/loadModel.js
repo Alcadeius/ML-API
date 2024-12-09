@@ -45,7 +45,7 @@ const predictImage = async (model, imageBuffer) => {
   try {
     const imageTensor = tf.node
       .decodeImage(imageBuffer)
-      .resizeBilinear([28, 28])
+      .resizeBilinear([280, 280])
       .mean(2)
       .toFloat()
       .div(tf.scalar(255.0))
