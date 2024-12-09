@@ -2,7 +2,12 @@ const { firestore } = require("../firebaseadmin");
 
 const savePrediction = async (prediction) => {
   try {
-    if (!prediction.userId || !prediction.topPredictions || !prediction.id) {
+    if (
+      !prediction.userId ||
+      !prediction.topPredictions ||
+      !prediction.id ||
+      !prediction.imageURL
+    ) {
       throw new Error("Invalid prediction data");
     }
 
@@ -13,6 +18,7 @@ const savePrediction = async (prediction) => {
 
     await userPredictionsRef.doc(prediction.id).set({
       topPredictions: prediction.topPredictions,
+      imageURL: prediction.imageURL,
       createdAt: prediction.createdAt || new Date().toISOString(),
     });
 

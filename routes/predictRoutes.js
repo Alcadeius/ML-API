@@ -13,7 +13,7 @@ const {
 } = require("../services/firestoreservice");
 const { errorHandler, errHandler } = require("../utils/errorHandler");
 const verifyToken = require("../middleware/verifyToken");
-
+const { bucket } = require("../firebaseadmin");
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -55,10 +55,19 @@ router.post("/predict", verifyToken, (req, res, next) => {
 
       const id = uuidv4();
       const createdAt = new Date().toISOString();
+      const file = bucket.file(`result/${id}.jpg`);
+      await file.save(req.file.buffer, {
+        metadata: { contentType: req.file.mimetype },
+      });
+      const [imageURL] = await file.getSignedUrl({
+        action: "read",
+        expires: "03-01-2025",
+      });
       const prediction = {
         id,
         userId: req.user.id,
         topPredictions: predictionResults,
+        imageURL,
         createdAt,
       };
 
@@ -109,10 +118,19 @@ router.post("/predict/handwrite", verifyToken, (req, res, next) => {
 
       const id = uuidv4();
       const createdAt = new Date().toISOString();
+      const file = bucket.file(`result/${id}.jpg`);
+      await file.save(req.file.buffer, {
+        metadata: { contentType: req.file.mimetype },
+      });
+      const [imageURL] = await file.getSignedUrl({
+        action: "read",
+        expires: "03-01-2025",
+      });
       const prediction = {
         id,
         userId: req.user.id,
         topPredictions: predictionResults,
+        imageURL,
         createdAt,
       };
 

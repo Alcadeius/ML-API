@@ -3,9 +3,10 @@ const serviceAccount = require("./google-services.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "kaliatra.firebasestorage.app",
+  storageBucket: "kaliatra",
 });
 
 const firestore = admin.firestore();
+const bucket = admin.storage().bucket();
 
-module.exports = { admin, firestore };
+module.exports = { admin, firestore, bucket };
